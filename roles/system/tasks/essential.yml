@@ -1,0 +1,46 @@
+---
+- name: Debian and Ubuntu Specific
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Generate the locale.
+      locale_gen:
+        name: "{{ locale }}"
+        state: present
+
+    - name: Update apt cache.
+      apt:
+        update_cache: yes
+        cache_valid_time: 43200
+
+    - name: Upgrade apt packages.
+      apt:
+        upgrade: yes
+        autoremove: yes
+
+- name: Check if reboot required.
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required_file
+
+- name: Reboot if required.
+  reboot:
+    msg: Rebooting due to a kernel update...
+  when: reboot_required_file.stat.exists
+
+- name: Install essential packages.
+  package:
+    name: "{{ essential_packages }}"
+    state: present
+
+- name: Set the hostname.
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Replace the hostname entry with our own.
+  lineinfile:
+    path: /etc/hosts
+    insertafter: ^127\.0\.0\.1 *localhost
+    line: "127.0.0.1 {{ inventory_hostname }}"
+    owner: root
+    group: root
+    mode: "0644"

@@ -1,0 +1,39 @@
+---
+- name: Disable SSH password auth and root login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: "sshd -t -f %s"
+  with_items:
+    - regexp: "^PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^PermitRootLogin"
+      line: "PermitRootLogin no"
+  register: sshd_config
+
+- name: Restart SSH daemon
+  service:
+    name: sshd
+    state: restarted
+  when: sshd_config.changed
+
+- name: Configure the permissions for the messages log.
+  file:
+    path: /var/log/syslog
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Enable automatic login for "{{ username }}"
+  lineinfile:
+    dest: /etc/gdm3/custom.conf
+    regexp: "{{ item.regexp }}"
+    line: " {{ item.line }}"
+    state: present
+  with_items:
+    - regexp: "^AutomaticLoginEnable"
+      line: "AutomaticLoginEnable = true"
+    - regexp: "^AutomaticLogin"
+      line: "AutomaticLogin = {{ username }}"

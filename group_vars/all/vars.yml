@@ -1,0 +1,17 @@
+username: ali
+
+essential_packages:
+  - nano
+  - net-tools
+  - zsh
+  - build-essential
+  - procps
+  - curl
+  - file
+  - git
+
+locale: en_US.UTF-8
+ssh_public_key: "{{ lookup('file', '~/.ssh/homeserver.pub') }}"
+
+download_dir: "/tmp/"
+enable_samba: false

@@ -34,18 +34,6 @@
       - sambashare
     append: true
 
-- name: Chmod home directory for user '{{ username }}'.
-  become: yes
-  file:
-    path: "/home/{{ username }}"
-    state: directory
-    mode: "0755"
-    owner: "{{ username }}"
-    group: "{{ username }}"
-    modification_time: preserve
-    access_time: preserve
-    recurse: yes
-
 - name: Allow '"{{ sudo_group }}"' group to have no password sudo.
   lineinfile:
     path: /etc/sudoers

@@ -1,0 +1,32 @@
+- name: Ensure zsh is installed.
+  apt:
+    name: zsh
+    state: present
+
+- name: Ensure the oh-my-zsh and plugin repos are cloned.
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+      dest: "/home/{{ username }}/.oh-my-zsh"
+    - repo: "https://github.com/zsh-users/zsh-autosuggestions"
+      dest: "/home/{{ username }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    - repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+      dest: "/home/{{ username }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+- name: Create the .zshrc file.
+  template:
+    src: "zshrc_template.j2"
+    dest: "/home/{{ username }}/.zshrc"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0644"
+    force: yes
+
+- name: Ensure zsh is the default terminal.
+  become: yes
+  user:
+    name: "{{ username }}"
+    shell: "/usr/bin/zsh"
+    update_password: on_create

@@ -1,0 +1,5 @@
+omz_theme: intheloop
+zsh_plugins:
+  - git
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting

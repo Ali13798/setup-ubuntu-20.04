@@ -3,3 +3,5 @@
   roles:
     - role: system
       become: yes
+
+    - role: installations
